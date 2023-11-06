@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/go-co-op/gocron"
+	"log"
 	"time"
 )
 
@@ -10,28 +10,24 @@ type Cache struct {
 	expires map[string]time.Time
 }
 
-func NewCache() (*Cache, error) {
+func NewCache() *Cache {
 	mem := &Cache{
 		data:    make(map[string]interface{}),
 		expires: make(map[string]time.Time),
 	}
 
-	s := gocron.NewScheduler(time.UTC)
-	_, err := s.Every(10).Minutes().WaitForSchedule().Do(mem.clearExpires)
-	if err != nil {
-		return nil, err
-	}
-
-	return mem, nil
+	return mem
 }
 
-func (c *Cache) clearExpires() {
+func (c *Cache) ClearExpires() {
+	log.Println("run clear", "cache before clear", c.data, c.expires)
 	for key, value := range c.expires {
 		if value.Before(time.Now()) {
 			delete(c.data, key)
 			delete(c.expires, key)
 		}
 	}
+	log.Println("cache after clear", c.data, c.expires, "cleared")
 }
 
 func (c *Cache) Set(key string, value interface{}, ttl int) {
