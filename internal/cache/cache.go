@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"log"
 	"sync"
 	"time"
 )
@@ -22,14 +21,12 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) ClearExpires() {
-	log.Println("run clear", "cache before clear", c.data, c.expires)
 	for key, value := range c.expires {
 		if value.Before(time.Now()) {
 			delete(c.data, key)
 			delete(c.expires, key)
 		}
 	}
-	log.Println("cache after clear", c.data, c.expires, "cleared")
 }
 
 func (c *Cache) Set(key string, value interface{}, ttl int) {
